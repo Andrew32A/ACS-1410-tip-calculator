@@ -9,6 +9,16 @@
 import UIKit
 
 class ViewController: UIViewController {
+    
+    // MARK: - Properties
+
+    // 1 (at the top of the file inside the class, outside of other functions)
+    var isDefaultStatusBar = true
+
+    // 2 (inside the class outside of the other functions)
+    override var preferredStatusBarStyle: UIStatusBarStyle {
+        return isDefaultStatusBar ? .default : .lightContent
+    }
 
     @IBOutlet weak var headerView: UIView!
     @IBOutlet weak var titleLabel: UILabel!
@@ -32,6 +42,9 @@ class ViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+
+        setupViews()
+        setTheme(isDark: false)
 
         billAmountTextField.calculateButtonAction = {
             self.calculate()
@@ -76,9 +89,10 @@ class ViewController: UIViewController {
     
     @IBAction func themeToggled(_ sender: UISwitch) {
         if sender.isOn {
-          print("switch toggled on")
+            setTheme(isDark: sender.isOn)
         } else {
-          print("switch toggled off")
+            // 👉 Toggle off
+            setTheme(isDark: false)
         }
     }
     
@@ -95,5 +109,48 @@ class ViewController: UIViewController {
         tipPercentSegmentedControl.selectedSegmentIndex = 0
         tipAmountLabel.text = "$0.00"
         totalAmountLabel.text = "$0.00"
+    }
+    
+    func setupViews() {
+        headerView.layer.shadowOffset = CGSize(width: 0, height: 1)
+        headerView.layer.shadowOpacity = 0.05
+        headerView.layer.shadowColor = UIColor.black.cgColor
+        headerView.layer.shadowRadius = 35
+
+        outputCardView.layer.cornerRadius = 8
+        outputCardView.layer.masksToBounds = true
+        outputCardView.layer.borderWidth = 1
+        outputCardView.layer.borderColor = UIColor.tcBlack.cgColor
+
+        resetButton.layer.cornerRadius = 8
+        resetButton.layer.masksToBounds = true
+    }
+    
+    func setTheme(isDark: Bool) {
+        let theme = isDark ? ColorTheme.dark : ColorTheme.light
+
+        view.backgroundColor = theme.viewControllerBackgroundColor
+
+        headerView.backgroundColor = theme.primaryColor
+        titleLabel.textColor = theme.primaryTextColor
+
+        inputCardView.backgroundColor = theme.secondaryColor
+
+        billAmountTextField.tintColor = theme.accentColor
+        tipPercentSegmentedControl.tintColor = theme.accentColor
+
+        outputCardView.backgroundColor = theme.primaryColor
+        outputCardView.layer.borderColor = theme.accentColor.cgColor
+
+        tipAmountTitleLabel.textColor = theme.primaryTextColor
+        totalAmountTitleLabel.textColor = theme.primaryTextColor
+
+        tipAmountLabel.textColor = theme.outputTextColor
+        totalAmountLabel.textColor = theme.outputTextColor
+
+        resetButton.backgroundColor = theme.secondaryColor
+        
+        isDefaultStatusBar = theme.isDefaultStatusBar
+        setNeedsStatusBarAppearanceUpdate()
     }
 }
